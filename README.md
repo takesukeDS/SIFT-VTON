@@ -1,6 +1,6 @@
 # [ICPR2026] SIFT-VTON: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On
 
-![teaser](assets/teaser.png)&nbsp;
+![teaser](assets/teaser.jpg)&nbsp;
 
 ## TODO
 - [x] Code for preprocessing
