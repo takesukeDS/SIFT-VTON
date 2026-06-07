@@ -3,7 +3,6 @@ license: cc-by-nc-sa-4.0
 tags:
   - virtual-try-on
   - diffusion
-  - controlnet
   - image-to-image
   - computer-vision
 datasets:
@@ -18,7 +17,9 @@ arxiv: 2605.01296
 
 SIFT-VTON is a diffusion-based virtual try-on model that uses SIFT feature correspondences between a garment image and a person image to supervise cross-attention maps during training, improving geometric alignment in the generated results.
 
-This model is derived from [StableVITON](https://github.com/rlawjdghek/stableviton) and built on a ControlNet architecture with a Stable Diffusion backbone.
+Paper: [arXiv:2605.01296](https://arxiv.org/abs/2605.01296)
+
+This model is derived from [StableVITON](https://github.com/rlawjdghek/stableviton) and built on a Stable Diffusion backbone.
 
 The code repository is available at [takesukeDS/SIFT-VTON](https://github.com/takesukeDS/SIFT-VTON).
 
