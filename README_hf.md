@@ -110,11 +110,14 @@ The model and config are downloaded automatically from this Hub repository on th
 ## Citation
 
 ```bibtex
-@inproceedings{takemoto2026siftvton,
-  title     = {SIFT-VTON: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On},
-  author    = {Takemoto, Keisuke},
-  booktitle = {Proceedings of the International Conference on Pattern Recognition (ICPR)},
-  year      = {2026}
+@misc{takemoto2026siftvton,
+  title         = {{SIFT-VTON}: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On},
+  author        = {Takemoto, Kosuke and Koshinaka, Takafumi},
+  year          = {2026},
+  eprint        = {2605.01296},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2605.01296}
 }
 ```
 

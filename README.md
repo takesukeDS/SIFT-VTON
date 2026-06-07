@@ -77,5 +77,18 @@ Move `[output dir]/train` into `[VITON-HD dataset dir]/train` as `sift_matching`
 mv [output dir]/train [VITON-HD dataset dir]/train/sift_matching
 ```
 
+## Citation
+```bibtex
+@misc{takemoto2026siftvton,
+  title         = {{SIFT-VTON}: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On},
+  author        = {Takemoto, Kosuke and Koshinaka, Takafumi},
+  year          = {2026},
+  eprint        = {2605.01296},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2605.01296}
+}
+```
+
 ## License
 Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
