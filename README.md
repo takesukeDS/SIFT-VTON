@@ -2,12 +2,15 @@
 
 ![teaser](assets/teaser.jpg)&nbsp;
 
+This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
+
 ## TODO
 - [x] Code for preprocessing
 - [ ] Filtered SIFT correspondences(json) on VITON-HD dataset
 - [ ] Code for training SIFT-VTON
 - [ ] Code for inference 
-- [ ] Instructions for preprocessing
+- [ ] Trained weights of SIFT-VTON
+- [x] Instructions for preprocessing
 - [ ] Instructions for training 
 - [ ] Instructions for inference 
 
@@ -64,7 +67,7 @@ test
 |-- cloth_mask
 ```
 
-## SIFT matching and filtering for training on VITON-HD dataset
+## Preprocessing: SIFT matching and filtering for training on VITON-HD dataset
 The code below saves the filtered SIFT correspondences in json for each image pair in the VITON-HD dataset. 
 ```
 python save_sift_matching.py --save_dir [output dir] --data_root_dir [VITON-HD dataset dir] --data_type train --cloth_segmentation_base_dir [cloth_parsing_dir] 
