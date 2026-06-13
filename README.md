@@ -6,13 +6,13 @@ This repository is derived from [StableVITON](https://github.com/rlawjdghek/stab
 
 ## TODO
 - [x] Code for preprocessing
-- [ ] Filtered SIFT correspondences(json) on VITON-HD dataset
+- [x] Filtered SIFT correspondences(json) on VITON-HD dataset
 - [ ] Code for training SIFT-VTON
-- [ ] Code for inference 
-- [ ] Trained weights of SIFT-VTON
+- [x] Code for inference 
+- [x] Trained weights of SIFT-VTON
 - [x] Instructions for preprocessing
 - [ ] Instructions for training 
-- [ ] Instructions for inference 
+- [x] Instructions for inference 
 
 ## Environments
 ```bash
@@ -40,41 +40,63 @@ pip install numpy==2.2.6
 
 ```
 
-## Weights and Data
-Our weights are not publicly available yet.
+## Weights and Data Preparation
+Our weights are publicly available on huggingface [takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON), 
+and inference_hf.py automatically downloads the weights from huggingface when you run inference.
+
+
+### For inference (minimum data preparation)
 You can download the VITON-HD dataset from [here](https://github.com/shadow2496/VITON-HD).<br>
-Additionally, we used garment parts segmentation provided by GP-VTON for better spatial matching.
-Download Fine-grained Parsing in [GP-VTON](https://github.com/xiezhy6/GP-VTON) for VITON-HD dataset.
-We refer the directory where you unzipped the cloth parsing as `[cloth_parsing_dir]` in the following instructions. 
+
+Pairs definition files for the train/val/test splits (`siftvton_train_pairs.txt`, `siftvton_val_pairs.txt`, `siftvton_test_pairs.txt`) are available on the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON). Download them and place them directly under the dataset root directory:
+```bash
+hf download takesuke/SIFT-VTON siftvton_train_pairs.txt siftvton_val_pairs.txt siftvton_test_pairs.txt --local-dir [VITON-HD dataset dir]
+```
 
 For inference, the following VITON-HD dataset structure is required:
 ```
-train
-|-- image
-|-- image-densepose
-|-- agnostic
-|-- agnostic-mask
-|-- cloth
-|-- cloth_mask
-|-- gt_cloth_warped_mask (for ATV loss)
-
-test
-|-- image
-|-- image-densepose
-|-- agnostic
-|-- agnostic-mask
-|-- cloth
-|-- cloth_mask
+[VITON-HD dataset dir]
+|-- train
+|   |-- image
+|   |-- image-densepose
+|   |-- agnostic-v3.2
+|   |-- agnostic-mask
+|   |-- cloth
+|   |-- cloth-mask
+|   |-- gt_cloth_warped_mask (for ATV loss)
+|-- test
+|   |-- image
+|   |-- image-densepose
+|   |-- agnostic-v3.2
+|   |-- agnostic-mask
+|   |-- cloth
+|   |-- cloth-mask
+|-- siftvton_train_pairs.txt
+|-- siftvton_val_pairs.txt
+|-- siftvton_test_pairs.txt
 ```
+
+### For SIFT matching and filtering (Optional)
+If you want to compute SIFT correspondences manually for training,
+download Fine-grained Parsing in [GP-VTON](https://github.com/xiezhy6/GP-VTON) for VITON-HD dataset.
+We used garment parts segmentation provided by GP-VTON for better spatial matching.
+We refer the directory where you unzipped the cloth parsing as `[cloth_parsing_dir]` in the following instructions.
 
 ## Preprocessing: SIFT matching and filtering for training on VITON-HD dataset
 The code below saves the filtered SIFT correspondences in json for each image pair in the VITON-HD dataset. 
 ```
 python save_sift_matching.py --save_dir [output dir] --data_root_dir [VITON-HD dataset dir] --data_type train --cloth_segmentation_base_dir [cloth_parsing_dir] 
 ```
-Move `[output dir]/train` into `[VITON-HD dataset dir]/train` as `sift_matching` like below:
+Move `[output dir]/train` into `[VITON-HD dataset dir]/train` as `sift_matching` like below if you want to run training code:
 ```
 mv [output dir]/train [VITON-HD dataset dir]/train/sift_matching
+```
+
+Alternatively, you can download the precomputed SIFT correspondences for the train split from the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON) and place it under the `train` directory of the VITON-HD dataset:
+```bash
+hf download takesuke/SIFT-VTON sift_matching.zip --local-dir [VITON-HD dataset dir]/train
+cd [VITON-HD dataset dir]/train
+unzip sift_matching.zip
 ```
 
 ## Citation

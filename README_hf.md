@@ -71,7 +71,11 @@ Download the [VITON-HD dataset](https://github.com/shadow2496/VITON-HD) and prep
     |-- cloth-mask
 ```
 
-A pairs file `siftvton_test_pairs.txt` is also required under `[data_root_dir]`, listing image and cloth filenames one pair per line:
+Pairs definition files (`siftvton_train_pairs.txt`, `siftvton_val_pairs.txt`, `siftvton_test_pairs.txt`) are provided in this Hub repository — download the one matching your `--phase` and place it directly under `[data_root_dir]`:
+```bash
+hf download takesuke/SIFT-VTON siftvton_test_pairs.txt --local-dir [data_root_dir]
+```
+Each line lists an image and cloth filename pair:
 ```
 image_00001.jpg cloth_00001.jpg
 image_00002.jpg cloth_00002.jpg
@@ -82,7 +86,7 @@ image_00002.jpg cloth_00002.jpg
 
 ```bash
 python inference_hf.py \
-    --repo_id takesukeDS/SIFT-VTON \
+    --repo_id takesuke/SIFT-VTON \
     --data_root_dir [data_root_dir] \
     --save_dir [output_dir] \
     --phase test \
@@ -98,7 +102,7 @@ The model and config are downloaded automatically from this Hub repository on th
 
 | Argument | Default | Description |
 |---|---|---|
-| `--repo_id` | — | This Hub repo (`takesukeDS/SIFT-VTON`) |
+| `--repo_id` | — | This Hub repo (`takesuke/SIFT-VTON`) |
 | `--phase` | `test` | `test` for the test split, `train` for the training split |
 | `--cfg_scale` | `1.0` | Classifier-free guidance scale |
 | `--denoise_steps` | `50` | Number of PLMS denoising steps |

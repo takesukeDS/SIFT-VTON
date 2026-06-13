@@ -3,7 +3,7 @@ HuggingFace Hub-compatible inference for SIFT-VTON.
 
 Load from HuggingFace Hub:
     python inference_hf.py \
-        --repo_id takesukeDS/SIFT-VTON \
+        --repo_id takesuke/SIFT-VTON \
         --data_root_dir ~/data/zalando-hd-resized \
         --save_dir ./output \
         --phase test \
@@ -44,7 +44,7 @@ def build_args():
 
     # HuggingFace Hub loading (alternative to --config_path + --model_load_path)
     parser.add_argument("--repo_id", type=str, default=None,
-                        help="HuggingFace Hub repo ID, e.g. 'takesukeDS/SIFT-VTON'")
+                        help="HuggingFace Hub repo ID, e.g. 'takesuke/SIFT-VTON'")
     parser.add_argument("--config_filename", type=str, default="config.yaml",
                         help="Filename of the config inside the Hub repo")
     parser.add_argument("--model_filename", type=str, default="model.ckpt",
