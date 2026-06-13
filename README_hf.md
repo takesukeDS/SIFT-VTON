@@ -71,7 +71,7 @@ Download the [VITON-HD dataset](https://github.com/shadow2496/VITON-HD) and prep
     |-- cloth-mask
 ```
 
-A pairs file `yahavton_test_pairs.txt` is also required under `[data_root_dir]`, listing image and cloth filenames one pair per line:
+A pairs file `siftvton_test_pairs.txt` is also required under `[data_root_dir]`, listing image and cloth filenames one pair per line:
 ```
 image_00001.jpg cloth_00001.jpg
 image_00002.jpg cloth_00002.jpg

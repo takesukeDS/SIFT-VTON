@@ -28,7 +28,7 @@ model:
     mask2_key: "agn_mask"
     mask3_key: null
     histogram_keys: ["hist16", "hist32", "hist64"]
-    yahavton: True
+    siftvton: True
     snr_gamma: null
 
     control_stage_config:
@@ -50,7 +50,7 @@ model:
         cond_first_ch: 4
 
     unet_config:
-      target: cldm.warping_cldm_network.YahaVTON
+      target: cldm.warping_cldm_network.SiftVTON
       params:
         image_size: 32
         in_channels: 13
@@ -99,7 +99,7 @@ model:
 
     cond_stage_config:
       target: ldm.modules.image_encoders.modules.FrozenCLIPImageEmbedder
-dataset_name: YahaVITONHDDataset
+dataset_name: SiftVITONHDDataset
 resume_path: ./ckpts/VITONHD_PBE_pose.ckpt
 default_prompt: ""
 log_images_kwargs:

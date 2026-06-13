@@ -119,7 +119,7 @@ def set_seed(seed):
 
 
 
-# YAHA-VTON SIFT matching and filtering
+# SIFT-VTON SIFT matching and filtering
 ANGLE_THRES = 45
 def filter_angle(keypoints1, keypoints2, match):
   idx1 = match.queryIdx

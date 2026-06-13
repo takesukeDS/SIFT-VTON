@@ -73,9 +73,9 @@ class ControlLDM(LatentDiffusion):
         self.gmm = None
         self.clothflow = None
         self.hybvton = kwargs.get("hybvton", False)
-        self.yahavton = kwargs.get("yahavton", False)
+        self.siftvton = kwargs.get("siftvton", False)
         self.snr_gamma = kwargs.get("snr_gamma", None)
-        if self.yahavton:
+        if self.siftvton:
             self.model.diffusion_model.set_alphas_cumprod(self.alphas_cumprod)
         self.resume = kwargs.get("resume", None)
     @torch.no_grad()
@@ -382,8 +382,8 @@ class ControlLDM(LatentDiffusion):
             opt = torch.optim.AdamW(params, lr=lr)
             print("============================")
             return opt
-        if self.yahavton:
-            print("yahavton mode")
+        if self.siftvton:
+            print("siftvton mode")
             params = list(self.control_model.parameters())
             print("control model is added")
             params += list(self.model.diffusion_model.output_blocks.parameters())
@@ -547,6 +547,6 @@ class ControlLDM(LatentDiffusion):
 
     def on_before_optimizer_step(self, *args, **kwargs):
         super().on_before_optimizer_step(*args, **kwargs)
-        if self.yahavton:
+        if self.siftvton:
             sch = self.lr_schedulers()
             sch.step()

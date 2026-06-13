@@ -13,7 +13,7 @@ Load from HuggingFace Hub:
 
 Load from local files:
     python inference_hf.py \
-        --config_path ./configs/YAHA-VTON_sift_loss_ave.yaml \
+        --config_path ./configs/SIFT-VTON_sift_loss_ave.yaml \
         --model_load_path ./ckpts/siftvton.ckpt \
         --data_root_dir ~/data/zalando-hd-resized \
         --save_dir ./output \

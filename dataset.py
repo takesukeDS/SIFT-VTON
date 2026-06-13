@@ -775,7 +775,7 @@ class VITONHDDatasetWithGAN(VITONHDDataset):
         )
 
 LATENT_SIZES = [(16, 12), (32, 24), (64, 48)]
-class YahaVITONHDDataset(Dataset):
+class SiftVITONHDDataset(Dataset):
     def __init__(
             self,
             data_root_dir,
@@ -932,7 +932,7 @@ class YahaVITONHDDataset(Dataset):
 
         im_names = []
         c_names = []
-        with open(opj(self.drd, f"yahavton_{self.phase}_pairs.txt"), "r") as f:
+        with open(opj(self.drd, f"siftvton_{self.phase}_pairs.txt"), "r") as f:
             for line in f.readlines():
                 im_name, c_name = line.strip().split()
                 if osp.splitext(im_name)[0] in exclude_image_ids:
@@ -985,8 +985,8 @@ class YahaVITONHDDataset(Dataset):
                 is_mask=True
             ) if not self.is_test else np.zeros_like(agn_mask)
 
-            yahavton_warped_mask = imread(
-                opj(self.drd, self.data_type, "yahavton_warped_mask_" + self.pair_key,
+            siftvton_warped_mask = imread(
+                opj(self.drd, self.data_type, "siftvton_warped_mask_" + self.pair_key,
                     self.im_names[idx].split(".")[0] + "_" + self.c_names[self.pair_key][idx].replace(".jpg", ".png")),
                 self.img_H,
                 self.img_W,
@@ -996,10 +996,10 @@ class YahaVITONHDDataset(Dataset):
             image = imread(opj(self.drd, self.data_type, "image", self.im_names[idx]), self.img_H, self.img_W)
             image_densepose = imread(opj(self.drd, self.data_type, "image-densepose", self.im_names[idx]), self.img_H,
                                      self.img_W)
-            yahavton_warped_mask = (yahavton_warped_mask / 255 * agn_mask / 255)
-            agn = agn * (1 - yahavton_warped_mask[:, :, None]) + yahavton_warped_cloth * yahavton_warped_mask[:, :, None]
+            siftvton_warped_mask = (siftvton_warped_mask / 255 * agn_mask / 255)
+            agn = agn * (1 - siftvton_warped_mask[:, :, None]) + siftvton_warped_cloth * siftvton_warped_mask[:, :, None]
             agn = agn.astype(np.uint8)
-            yahavton_warped_mask = (yahavton_warped_mask * 255).astype(np.uint8)
+            siftvton_warped_mask = (siftvton_warped_mask * 255).astype(np.uint8)
             agn_mask_orig = 255 - agn_mask
             agn_mask = 255 - agn_mask
 
@@ -1017,9 +1017,9 @@ class YahaVITONHDDataset(Dataset):
                 is_mask=True
             ) if not self.is_test else np.zeros_like(agn_mask)
 
-            yahavton_warp_flow = None
+            siftvton_warp_flow = None
             sift_matches = []
-            yahavton_warped_mask = np.ones((self.img_H, self.img_W), dtype=np.uint8) * 255
+            siftvton_warped_mask = np.ones((self.img_H, self.img_W), dtype=np.uint8) * 255
             sift_keypoints_person = sift_keypoints_cloth = np.array([])
             if self.use_sift_matching:
                 with open(opj(self.drd, self.data_type, "sift_matching",
@@ -1030,13 +1030,13 @@ class YahaVITONHDDataset(Dataset):
                     sift_keypoints_person = sift_matches[:, 0, :]
                     sift_keypoints_cloth = sift_matches[:, 1, :]
             if self.use_explicit_warping:
-                yahavton_warped_mask = imread_for_albu(
-                    opj(self.drd, self.data_type, "yahavton_warped_mask_" + self.pair_key,
+                siftvton_warped_mask = imread_for_albu(
+                    opj(self.drd, self.data_type, "siftvton_warped_mask_" + self.pair_key,
                         self.im_names[idx].split(".")[0] + "_" + self.c_names[self.pair_key][idx].split(".")[0] + "_torso_mask.png"),
                     is_mask=True
                 )
-                yahavton_warp_flow = torch.load(
-                    opj(self.drd, self.data_type, "yahavton_warp_flow_" + self.pair_key,
+                siftvton_warp_flow = torch.load(
+                    opj(self.drd, self.data_type, "siftvton_warp_flow_" + self.pair_key,
                         self.im_names[idx].split(".")[0] + "_" + self.c_names[self.pair_key][idx].split(".")[0] + "_torso_flow.pt"),
                     map_location=torch.device("cpu")
                 ).numpy()[0]
@@ -1073,8 +1073,8 @@ class YahaVITONHDDataset(Dataset):
 
                 cloth = transformed["cloth"]
                 cloth_mask = transformed["cloth_mask"]
-            if yahavton_warped_mask is not None:
-                yahavton_warped_mask = (yahavton_warped_mask / 255 * agn_mask / 255)
+            if siftvton_warped_mask is not None:
+                siftvton_warped_mask = (siftvton_warped_mask / 255 * agn_mask / 255)
             agn_mask_orig = 255 - agn_mask
             agn_orig = agn
 
@@ -1083,14 +1083,14 @@ class YahaVITONHDDataset(Dataset):
                 if self.torso_extraction_method == "torso_segment":
                     densepose_torso_mask = densepose_for_torso[:, :, 0] == DENSEPOSE_SEGM_RGB_TORSO[0]
                     densepose_torso_mask = densepose_torso_mask.astype(np.float32)
-                    yahavton_warped_mask = yahavton_warped_mask * densepose_torso_mask
+                    siftvton_warped_mask = siftvton_warped_mask * densepose_torso_mask
                 elif self.torso_extraction_method == "arm_elimination":
                     arm_mask = densepose_to_armmask(densepose_for_torso).astype(np.float32)
-                    yahavton_warped_mask = yahavton_warped_mask * (1 - arm_mask)
+                    siftvton_warped_mask = siftvton_warped_mask * (1 - arm_mask)
 
             agn = agn.astype(np.uint8)
-            if yahavton_warped_mask is not None:
-                yahavton_warped_mask = (yahavton_warped_mask * 255).astype(np.uint8)
+            if siftvton_warped_mask is not None:
+                siftvton_warped_mask = (siftvton_warped_mask * 255).astype(np.uint8)
 
             if self.transform_hflip is not None and random.random() < self.hflip_p:
                 if self.use_explicit_warping:
@@ -1102,15 +1102,15 @@ class YahaVITONHDDataset(Dataset):
                         cloth_mask=cloth_mask,
                         image_densepose=image_densepose,
                         gt_cloth_warped_mask=gt_cloth_warped_mask,
-                        yahavton_warped_mask=yahavton_warped_mask,
-                        yahavton_warp_flow=yahavton_warp_flow,
+                        siftvton_warped_mask=siftvton_warped_mask,
+                        siftvton_warp_flow=siftvton_warp_flow,
                         image_densepose_hybvton=image_densepose_hybvton,
                         keypoints=sift_keypoints_person,
                         keypoints_cloth=sift_keypoints_cloth
                     )
-                    yahavton_warped_mask = transformed["yahavton_warped_mask"]
-                    yahavton_warp_flow = transformed["yahavton_warp_flow"]
-                    yahavton_warp_flow[:, :, 0] = -yahavton_warp_flow[:, :, 0]  # flip x
+                    siftvton_warped_mask = transformed["siftvton_warped_mask"]
+                    siftvton_warp_flow = transformed["siftvton_warp_flow"]
+                    siftvton_warp_flow[:, :, 0] = -siftvton_warp_flow[:, :, 0]  # flip x
                 else:
                     transformed = self.transform_hflip(
                         image=image,
@@ -1144,7 +1144,7 @@ class YahaVITONHDDataset(Dataset):
                     agn_mask=agn_mask,
                     image_densepose=image_densepose,
                     gt_cloth_warped_mask=gt_cloth_warped_mask,
-                    yahavton_warped_mask=yahavton_warped_mask,
+                    siftvton_warped_mask=siftvton_warped_mask,
                     image_densepose_hybvton=image_densepose_hybvton,
                     keypoints=sift_keypoints_person
                 )
@@ -1154,7 +1154,7 @@ class YahaVITONHDDataset(Dataset):
                 agn_mask = transformed_image["agn_mask"]
                 image_densepose = transformed_image["image_densepose"]
                 gt_cloth_warped_mask = transformed_image["gt_cloth_warped_mask"]
-                yahavton_warped_mask = transformed_image["yahavton_warped_mask"]
+                siftvton_warped_mask = transformed_image["siftvton_warped_mask"]
                 image_densepose_hybvton = transformed_image["image_densepose_hybvton"]
                 sift_keypoints_person = transformed_image["keypoints"]
 
@@ -1234,9 +1234,9 @@ class YahaVITONHDDataset(Dataset):
                     histogram_output[l_idx] = histograms
                     hist_masks[l_idx] = (histograms.sum(dim=(-1, -2)) > 0).float()
             elif self.use_explicit_warping:
-                yahavton_warp_flow = torch.from_numpy(yahavton_warp_flow).float()
+                siftvton_warp_flow = torch.from_numpy(siftvton_warp_flow).float()
                 for l_idx, msize in enumerate(LATENT_SIZES):
-                    torso_flow_reshaped = yahavton_warp_flow.reshape(msize[0], self.img_H // msize[0],
+                    torso_flow_reshaped = siftvton_warp_flow.reshape(msize[0], self.img_H // msize[0],
                                                                      msize[1], self.img_W // msize[1], 2)
                     torso_flow_reshaped = torso_flow_reshaped.permute(0, 2, 1, 3, 4)
                     torso_flow_reshaped = torso_flow_reshaped.clip(-1, 1)
@@ -1278,7 +1278,7 @@ class YahaVITONHDDataset(Dataset):
             image_densepose = norm_for_albu(image_densepose)
             gt_cloth_warped_mask = norm_for_albu(gt_cloth_warped_mask, is_mask=True)
             if self.use_explicit_warping:
-                yahavton_warped_mask = norm_for_albu(yahavton_warped_mask, is_mask=True)
+                siftvton_warped_mask = norm_for_albu(siftvton_warped_mask, is_mask=True)
 
         return dict(
             agn=agn,
@@ -1293,7 +1293,7 @@ class YahaVITONHDDataset(Dataset):
             txt="",
             img_fn=img_fn,
             cloth_fn=cloth_fn,
-            yahavton_warped_mask=yahavton_warped_mask,
+            siftvton_warped_mask=siftvton_warped_mask,
             hist16=histogram_output[0],
             hist32=histogram_output[1],
             hist64=histogram_output[2],

@@ -33,7 +33,7 @@ def main(args):
     os.makedirs(save_dir, exist_ok=True)
     image_dir = osp.join(args.data_root_dir, args.data_type, "image")
     cloth_dir = osp.join(args.data_root_dir, args.data_type, "cloth")
-    segm_dir = osp.join(args.data_root_dir, args.data_type, "image-densepose_yahavton")
+    segm_dir = osp.join(args.data_root_dir, args.data_type, "image-densepose_siftvton")
     ag_mask_dir = osp.join(args.data_root_dir, args.data_type, "agnostic-mask")
     image_name_list = os.listdir(image_dir)
     print(f"Found {len(image_name_list)} images in {args.data_type} set.")

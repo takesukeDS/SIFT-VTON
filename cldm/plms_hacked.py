@@ -597,7 +597,7 @@ class PLMSSamplerHybvton(PLMSSampler):
         return img, intermediates, None
 
 
-class PLMSSamplerYaha(object):
+class PLMSSamplerSiftVTON(object):
     def __init__(self, model, schedule="linear", **kwargs):
         super().__init__()
         self.model = model

@@ -1131,7 +1131,7 @@ class ExplicitWarpSpatialTransformerSNR(nn.Module):
         return x + x_in, tv_loss_res, sift_loss_res
 
 
-class YahaVTON(UNetModel):
+class SiftVTON(UNetModel):
     def __init__(
             self,
             dim_head_denorm=1,
