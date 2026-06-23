@@ -7,11 +7,11 @@ This repository is derived from [StableVITON](https://github.com/rlawjdghek/stab
 ## TODO
 - [x] Code for preprocessing
 - [x] Filtered SIFT correspondences(json) on VITON-HD dataset
-- [ ] Code for training SIFT-VTON
+- [x] Code for training SIFT-VTON
 - [x] Code for inference 
 - [x] Trained weights of SIFT-VTON
 - [x] Instructions for preprocessing
-- [ ] Instructions for training 
+- [x] Instructions for training 
 - [x] Instructions for inference 
 
 ## Environments
