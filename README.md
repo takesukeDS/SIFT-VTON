@@ -101,7 +101,7 @@ unzip sift_matching.zip
 
 ## Training
 
-Download StableVITON's pretrained checkpoint from [StableVITON](https://github.com/rlawjdghek/stableviton) and place it under `ckpts/`. <!-- TODO: fill in exact filename/URL from StableVITON releases -->
+Download StableVITON's pretrained checkpoint for VITON-HD from [StableVITON](https://github.com/rlawjdghek/stableviton) and place it under `ckpts/`. 
 
 SIFT matching data (`sift_matching/` under `[VITON-HD dataset dir]/train/`) is required — see [For SIFT matching and filtering](#for-sift-matching-and-filtering-optional) above.
 
