@@ -32,28 +32,23 @@ The code repository is available at [takesukeDS/SIFT-VTON](https://github.com/ta
 
 ## Requirements
 
-Clone the code repository and set up the environment:
+Clone the code repository and set up the environment. All versions (Python 3.12.8 and every package, including CUDA 12.8 builds of PyTorch) are locked in `pyproject.toml` + `uv.lock`.
+
+Using [uv](https://docs.astral.sh/uv/) (recommended):
 
 ```bash
 git clone https://github.com/takesukeDS/SIFT-VTON
 cd SIFT-VTON
+uv sync   # installs Python 3.12.8 + all locked dependencies into .venv
+```
 
-conda create -n siftvton python==3.12.8 -y
-conda activate siftvton
+Or with pip (`requirements.txt` is exported from `uv.lock`):
 
-pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
-pip install matplotlib einops omegaconf yacs
-pip install pytorch-lightning==2.5.2
-pip install open-clip-torch==3.1.0
-pip install diffusers==0.34.0
-pip install scipy==1.16.1
-pip install transformers==4.55.0
-conda install -c anaconda ipython -y
-pip install scikit-image clean-fid albumentations==2.0.8
-pip3 install -U xformers==0.0.31.post1
-pip install tensorboard
-pip install accelerate==1.10.0
-pip install numpy==2.2.6
+```bash
+git clone https://github.com/takesukeDS/SIFT-VTON
+cd SIFT-VTON
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Data
