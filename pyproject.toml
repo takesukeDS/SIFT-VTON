@@ -1,0 +1,42 @@
+[project]
+name = "sift-vton"
+version = "1.0.0"
+description = "SIFT-VTON: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On (ICPR2026)"
+requires-python = "==3.12.*"
+dependencies = [
+    "torch==2.7.1",
+    "torchvision==0.22.1",
+    "pytorch-lightning==2.5.2",
+    "open-clip-torch==3.1.0",
+    "diffusers==0.34.0",
+    "transformers==4.55.0",
+    "accelerate==1.10.0",
+    "xformers==0.0.31.post1",
+    "numpy==2.2.6",
+    "scipy==1.16.1",
+    "albumentations==2.0.8",
+    "opencv-python-headless==4.13.0.92",
+    "matplotlib==3.11.1",
+    "einops==0.8.2",
+    "omegaconf==2.3.1",
+    "yacs==0.1.8",
+    "scikit-image==0.26.0",
+    "clean-fid==0.1.35",
+    "tensorboard==2.21.0",
+    "ipython==9.15.0",
+    "tqdm==4.69.0",
+    "pillow==12.3.0",
+    "huggingface-hub[cli]==0.36.2",
+]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128" }]
+torchvision = [{ index = "pytorch-cu128" }]

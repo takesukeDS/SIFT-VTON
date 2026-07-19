@@ -15,30 +15,29 @@ This repository is derived from [StableVITON](https://github.com/rlawjdghek/stab
 - [x] Instructions for inference 
 
 ## Environments
+The environment is fully locked: `pyproject.toml` + `uv.lock` pin Python 3.12.8 and every package version, including CUDA 12.8 builds of PyTorch. Two ways to set it up:
+
+### Option 1: [uv](https://docs.astral.sh/uv/) (recommended)
+```bash
+# install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+git clone https://github.com/takesukeDS/SIFT-VTON
+cd SIFT-VTON
+uv sync   # installs Python 3.12.8 + all locked dependencies into .venv
+```
+Run any script with `uv run`, e.g. `uv run python inference_hf.py ...`, or activate `.venv` directly.
+
+### Option 2: pip
+`requirements.txt` is exported from `uv.lock` (it includes the PyTorch cu128 index):
 ```bash
 git clone https://github.com/takesukeDS/SIFT-VTON
 cd SIFT-VTON
-
-conda create -n siftvton python==3.12.8 -y
-conda activate siftvton
-
-# install packages
-pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
-pip install matplotlib einops omegaconf yacs
-pip install pytorch-lightning==2.5.2
-pip install open-clip-torch==3.1.0
-pip install diffusers==0.34.0
-pip install scipy==1.16.1
-pip install transformers==4.55.0
-conda install -c anaconda ipython -y
-pip install scikit-image clean-fid albumentations==2.0.8
-pip3 install -U xformers==0.0.31.post1
-
-pip install tensorboard
-pip install accelerate==1.10.0
-pip install numpy==2.2.6
-
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
+
+> **Note:** SIFT is provided by the pinned `opencv-python-headless` package (`cv2.SIFT_create` is in mainline OpenCV ≥ 4.4). `opencv-contrib-python` is **not** required, and the headless build avoids any system `libGL` dependency on servers.
 
 ## Weights and Data Preparation
 Our weights are publicly available on huggingface [takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON), 
