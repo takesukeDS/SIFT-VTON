@@ -64,7 +64,7 @@ def build_args():
     parser.add_argument("--seed", type=int, default=1235, help="Random seed for reproducibility")
     parser.add_argument("--hist_only_max", action="store_true", help="Use only max value for histogram attn")
     parser.add_argument("--use_sift_loss", action="store_true", help="Use sift loss")
-    parser.add_argument("--sift_loss_scale", type=float, default=0.01, help="Sift loss scale")
+    parser.add_argument("--sift_loss_scale", type=float, default=0.0005, help="Sift loss scale")
     parser.add_argument("--tv_loss_scale", type=float, default=0.001, help="Total variation loss scale")
     parser.add_argument("--use_explicit_warping", action="store_true", help="Use explicit warping of ref image")
     parser.add_argument("--wandb_config_path", type=str, default=None)

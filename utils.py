@@ -651,7 +651,7 @@ def sift_match(img1, img2, lowe_ratio=0.75, cross_check=True, verbose=False):
     # filtering matches
     filtering_functions_1st = [filter_angle, filter_scale]
     for filter_func in filtering_functions_1st:
-        matches = list(filter(partial(filter_angle, keypoints1, keypoints2), matches))
+        matches = list(filter(partial(filter_func, keypoints1, keypoints2), matches))
         if verbose:
             print(f"Found {len(matches)} matches after {filter_func.__name__}")
 
