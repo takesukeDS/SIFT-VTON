@@ -321,8 +321,10 @@ torch==2.7.1+cu128
     #   torchmetrics
     #   torchvision
     #   xformers
-torchmetrics==1.9.0
-    # via pytorch-lightning
+torchmetrics==1.8.2
+    # via
+    #   pytorch-lightning
+    #   sift-vton
 torchvision==0.22.1 ; platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'
     # via
     #   clean-fid
