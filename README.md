@@ -129,6 +129,27 @@ CUDA_VISIBLE_DEVICES=0,1 python train_siftvton.py \
 | `--snr_gamma` | `5.0` | Min-SNR loss weighting |
 | `--accum_iter` | `8` | Gradient accumulation steps (effective batch = `batch_size × n_gpus × accum_iter`) |
 
+## Evaluation
+`evaluate.py` reproduces the quantitative results in Table 1. Predictions are the images produced by the inference scripts (the `pair` / `unpair` output directories).
+
+SSIM and LPIPS (paired test set):
+```bash
+uv run python evaluate.py \
+    --data_root_dir [VITON-HD dataset dir] \
+    --pred_dir [inference output dir]/pair \
+    --mode paired
+```
+
+FID and KID (unpaired test set):
+```bash
+uv run python evaluate.py \
+    --data_root_dir [VITON-HD dataset dir] \
+    --pred_dir [inference output dir]/unpair \
+    --mode unpaired
+```
+
+Implementation details (matching the paper's evaluation): SSIM/LPIPS are computed on full images resized to 384×512 (torchmetrics: AlexNet LPIPS, SSIM with `data_range=1.0`); FID/KID are computed with [clean-fid](https://github.com/GaParmar/clean-fid) against `test/image`. KID in Table 1 is multiplied by 1000.
+
 ## Citation
 ```bibtex
 @misc{takemoto2026siftvton,
