@@ -127,7 +127,7 @@ CUDA_VISIBLE_DEVICES=0,1 python train_siftvton.py \
 | `--use_sift_loss` | toggle | Enable SIFT correspondence supervision on cross-attention |
 | `--sift_loss_scale` | `0.0005` | Weight of SIFT loss relative to diffusion loss |
 | `--snr_gamma` | `5.0` | Min-SNR loss weighting |
-| `--accum_iter` | `8` | Gradient accumulation steps (effective batch = `batch_size × n_gpus × accum_iter`) |
+| `--accum_iter` | `8` | Gradient accumulation steps. `--batch_size` is the global batch (split across GPUs), so effective batch = `batch_size × accum_iter` = 32 |
 
 ## Evaluation
 `evaluate.py` reproduces the quantitative results in Table 1. Predictions are the images produced by the inference scripts (the `pair` / `unpair` output directories).
