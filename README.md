@@ -150,6 +150,8 @@ uv run python evaluate.py \
 
 Implementation details (matching the paper's evaluation): SSIM/LPIPS are computed on full images resized to 384×512 (torchmetrics: AlexNet LPIPS, SSIM with `data_range=1.0`); FID/KID are computed with [clean-fid](https://github.com/GaParmar/clean-fid) against `test/image`. KID in Table 1 is multiplied by 1000.
 
+> **Note on reproducibility:** inference uses a fixed random seed (`--seed 1235` by default), and evaluating a fixed set of generated predictions with `evaluate.py` is exactly reproducible.
+
 ## Citation
 ```bibtex
 @misc{takemoto2026siftvton,
