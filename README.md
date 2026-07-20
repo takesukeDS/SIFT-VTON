@@ -91,6 +91,8 @@ Move `[output dir]/train` into `[VITON-HD dataset dir]/train` as `sift_matching`
 mv [output dir]/train [VITON-HD dataset dir]/train/sift_matching
 ```
 
+> **Erratum:** in the code used for the paper's experiments, the scale-consistency filter (`filter_scale`) was inactive due to a bug (fixed in commit `4438ff6`); correspondences were filtered by the angle, HSV, and RANSAC constraints only. The released precomputed correspondences below match that legacy behavior. To regenerate the paper's correspondences exactly, pass `--legacy_filtering`; the default now applies the corrected filtering (measured difference: ~2.5% of matches, ~8% of image pairs affected, 92% of files unchanged).
+
 Alternatively, you can download the precomputed SIFT correspondences for the train split from the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON) and place it under the `train` directory of the VITON-HD dataset:
 ```bash
 hf download takesuke/SIFT-VTON sift_matching.zip --local-dir [VITON-HD dataset dir]/train
