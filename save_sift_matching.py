@@ -26,6 +26,8 @@ def parse_args():
     parser.add_argument("--cloth_segmentation_base_dir", type=str, default=None, help="Directory of cloth segmentation masks.")
     parser.add_argument("--seed", type=int, default=1235, help="Random seed.")
     parser.add_argument("--target", type=str, default="all", choices=["all", "torso", "left", "right"], help="Target part to match.")
+    parser.add_argument("--legacy_filtering", action="store_true",
+                        help="Reproduce the pre-fix filtering (filter_scale skipped); for comparison only.")
     return parser.parse_args()
 
 def main(args):
@@ -111,7 +113,8 @@ def main(args):
             img2[segm_cloth_mask_np] = img2_org[segm_cloth_mask_np]
             img2 = img2.astype(np.uint8)
 
-            matches, keypoints1, keypoints2 = sift_match(img1, img2, lowe_ratio=args.lowe_ratio, verbose=args.verbose)
+            matches, keypoints1, keypoints2 = sift_match(img1, img2, lowe_ratio=args.lowe_ratio, verbose=args.verbose,
+                                                         legacy_filtering=args.legacy_filtering)
             matche_loc_list = [[keypoints1[m.queryIdx].pt, keypoints2[m.trainIdx].pt] for m in matches]
             matche_loc_list_all += matche_loc_list
             if idx < args.show_first_n:

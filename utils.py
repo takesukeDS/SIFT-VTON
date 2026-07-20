@@ -604,13 +604,15 @@ def filter_homography_ransac(src_pts, dst_pts, threshold, confidence=0.99, max_i
 
 
 RANSAC_THRESHOLD = 12.0
-def sift_match(img1, img2, lowe_ratio=0.75, cross_check=True, verbose=False):
+def sift_match(img1, img2, lowe_ratio=0.75, cross_check=True, verbose=False, legacy_filtering=False):
     """
     Match two images using SIFT and return the matched keypoints.
     :param img1: First image (numpy array).
     :param img2: Second image (numpy array).
     :param ratio: Lowe's ratio test threshold.
     :param cross_check: Whether to use cross-checking. not used if ratio < 1
+    :param legacy_filtering: Reproduce the pre-fix behavior where filter_scale was
+        silently skipped (filter_angle applied twice). For comparison only.
     :return: list of match objects, and two list of keypoints.
     """
     # Initialize SIFT detector
@@ -651,7 +653,8 @@ def sift_match(img1, img2, lowe_ratio=0.75, cross_check=True, verbose=False):
     # filtering matches
     filtering_functions_1st = [filter_angle, filter_scale]
     for filter_func in filtering_functions_1st:
-        matches = list(filter(partial(filter_func, keypoints1, keypoints2), matches))
+        applied_func = filter_angle if legacy_filtering else filter_func
+        matches = list(filter(partial(applied_func, keypoints1, keypoints2), matches))
         if verbose:
             print(f"Found {len(matches)} matches after {filter_func.__name__}")
 
