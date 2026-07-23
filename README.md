@@ -4,6 +4,8 @@
 
 This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
 
+> ⚠️ **Known issue:** the SIFT scale filter was inactive in the paper's experiments — see [#2](https://github.com/takesukeDS/SIFT-VTON/issues/2) for details, impact, and fix.
+
 ## TODO
 - [x] Code for preprocessing
 - [x] Filtered SIFT correspondences(json) on VITON-HD dataset
