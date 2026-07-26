@@ -37,6 +37,9 @@ def build_args():
     parser.add_argument("--use_atv_loss", action="store_true")
     parser.add_argument("--valid_epoch_freq", type=int, default=20)
     parser.add_argument("--save_every_n_epochs", type=int, default=20)
+    parser.add_argument("--num_workers", type=int, default=4,
+                        help="DataLoader worker processes. Use 0 to disable multiprocessing "
+                             "(avoids fork-related native-library crashes on some machines).")
     parser.add_argument("--max_epochs", type=int, default=1000)
     parser.add_argument("--save_root_dir", type=str, default="./logs")
     parser.add_argument("--save_name", type=str, default="dummy")
@@ -197,21 +200,21 @@ def main_worker(args):
       
     train_dataloader = DataLoader(
         train_dataset,
-        num_workers=4, 
+        num_workers=args.num_workers, 
         batch_size=max(args.batch_size//args.n_gpus, 1), 
         shuffle=True, 
         pin_memory=True
     )
     valid_paired_dataloader = DataLoader(
         valid_paired_dataset, 
-        num_workers=4, 
+        num_workers=args.num_workers, 
         batch_size=max(args.batch_size//args.n_gpus, 1), 
         shuffle=False, 
         pin_memory=True
     )
     valid_unpaired_dataloader = DataLoader(
         valid_unpaired_dataset, 
-        num_workers=4, 
+        num_workers=args.num_workers, 
         batch_size=max(args.batch_size//args.n_gpus, 1), 
         shuffle=False, 
         pin_memory=True
