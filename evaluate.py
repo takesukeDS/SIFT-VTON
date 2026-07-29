@@ -1,7 +1,10 @@
 """Evaluation script reproducing Table 1 of the SIFT-VTON paper.
 
-Paired mode  : SSIM + LPIPS between predictions and ground-truth test images.
-Unpaired mode: FID + KID (clean-fid) between predictions and test/image.
+Paired mode  : SSIM + LPIPS between predictions and ground-truth images.
+Unpaired mode: FID + KID (clean-fid) between predictions and the reference image folder.
+
+--split selects the split: 'test' (Table 1) or 'val'. Because the val split is a held-out
+subset of VITON-HD's train images, '--split val' reads ground truth from train/image.
 
 Implementations and preprocessing mirror the evaluation used for the paper:
 - LPIPS: torchmetrics LearnedPerceptualImagePatchSimilarity (AlexNet), inputs in [-1, 1]
@@ -20,6 +23,11 @@ import torch
 from tqdm import tqdm
 
 RESIZE_SIZE = (384, 512)  # (W, H) as passed to cv2.resize
+
+# The val split is a held-out subset of VITON-HD's train images, so its ground truth
+# lives under train/ -- same mapping as dataset.py (phase "val" -> data_type "train").
+SPLIT_DATA_DIR = {"test": "test", "val": "train"}
+SPLIT_PAIR_LIST = {"test": "test_pairs.txt", "val": "siftvton_val_pairs.txt"}
 
 
 def normalize_from_rgb(image):
@@ -44,8 +52,8 @@ def to_tensor(image, device):
     return torch.from_numpy(image).permute(2, 0, 1)[None].to(device)
 
 
-def load_agnostic_mask(data_root_dir, person_id, device, resize_size=RESIZE_SIZE):
-    mask_path = osp.join(data_root_dir, "test", "agnostic-mask", f"{person_id}_00_mask.png")
+def load_agnostic_mask(data_root_dir, split, person_id, device, resize_size=RESIZE_SIZE):
+    mask_path = osp.join(data_root_dir, split, "agnostic-mask", f"{person_id}_00_mask.png")
     mask = cv2.imread(mask_path)
     if mask is None:
         raise FileNotFoundError(f"Could not read agnostic mask: {mask_path}")
@@ -62,11 +70,12 @@ def evaluate_paired(args, device):
     lpips_func = LearnedPerceptualImagePatchSimilarity().to(device)
     ssim_func = StructuralSimilarityIndexMeasure(reduction="sum", data_range=1.0).to(device)
 
-    pair_list_path = args.pair_list or osp.join(args.data_root_dir, "test_pairs.txt")
+    data_dir = SPLIT_DATA_DIR[args.split]
+    pair_list_path = args.pair_list or osp.join(args.data_root_dir, SPLIT_PAIR_LIST[args.split])
     with open(pair_list_path) as f:
         pair_rows = list(csv.reader(f, delimiter=" "))
 
-    gt_dir = osp.join(args.data_root_dir, "test", "image")
+    gt_dir = osp.join(args.data_root_dir, data_dir, "image")
     lpips_total, ssim_total = 0.0, 0.0
     worst_lpips, worst_lpips_id = 0.0, None
     worst_ssim, worst_ssim_id = 1.0, None
@@ -85,7 +94,7 @@ def evaluate_paired(args, device):
         gt = to_tensor(read_image_by_cv2(osp.join(gt_dir, fname_person)), device)
 
         if args.restrict_region:
-            mask = load_agnostic_mask(args.data_root_dir, person_id, device)
+            mask = load_agnostic_mask(args.data_root_dir, data_dir, person_id, device)
             pred = pred * mask
             gt = gt * mask
 
@@ -112,7 +121,18 @@ def evaluate_unpaired(args, device):
     from cleanfid import fid as cleanfid_fid
     import glob
 
-    ref_dir = osp.join(args.data_root_dir, "test", "image")
+    if args.ref_dir:
+        ref_dir = args.ref_dir
+    elif args.split == "val":
+        # clean-fid compares whole folders, so the default would score against every
+        # train image, not just the val subset. Refuse rather than report that number.
+        raise SystemExit(
+            "unpaired mode on --split val needs --ref_dir: the val ground truth shares "
+            f"{osp.join(args.data_root_dir, 'train', 'image')} with the training images, "
+            "and FID/KID would be computed against all of them. Pass a directory holding "
+            "only the val images listed in siftvton_val_pairs.txt.")
+    else:
+        ref_dir = osp.join(args.data_root_dir, SPLIT_DATA_DIR[args.split], "image")
     n_ref = len(glob.glob(osp.join(ref_dir, "*")))
     n_pred = len(glob.glob(osp.join(args.pred_dir, "*")))
     if n_ref != n_pred:
@@ -128,12 +148,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data_root_dir", required=True,
-                        help="VITON-HD dataset root (expects test/image, test/agnostic-mask)")
+                        help="VITON-HD dataset root (expects <split dir>/image, <split dir>/agnostic-mask)")
     parser.add_argument("--pred_dir", required=True,
                         help="Directory of generated images (inference output pair/ or unpair/)")
     parser.add_argument("--mode", required=True, choices=["paired", "unpaired"])
+    parser.add_argument("--split", default="test", choices=sorted(SPLIT_DATA_DIR),
+                        help="Which split to score. 'test' reads test/image; 'val' reads "
+                             "train/image (the val split is a subset of the train images, "
+                             "as in dataset.py) and defaults to siftvton_val_pairs.txt")
     parser.add_argument("--pair_list", default=None,
-                        help="Pairs file (default: <data_root_dir>/test_pairs.txt); paired mode only")
+                        help="Pairs file (default: <data_root_dir>/<split pairs file>); paired mode only")
+    parser.add_argument("--ref_dir", default=None,
+                        help="Reference image folder for FID/KID (default: <data_root_dir>/"
+                             "<split dir>/image); required for --split val; unpaired mode only")
     parser.add_argument("--pred_fname_format", default="{person_id}_00_{cloth_id}_00.jpg",
                         help="Prediction filename pattern; paired mode only")
     parser.add_argument("--restrict_region", action="store_true",
@@ -151,12 +178,13 @@ def main():
     else:
         results = evaluate_unpaired(args, device)
 
-    results["settings"] = {"mode": args.mode, "pred_dir": args.pred_dir,
+    results["settings"] = {"mode": args.mode, "split": args.split,
+                           "pred_dir": args.pred_dir,
                            "restrict_region": args.restrict_region,
                            "resize_wh": list(RESIZE_SIZE)}
     print(json.dumps(results, indent=2))
     out_path = osp.join(osp.dirname(osp.normpath(args.pred_dir)),
-                        f"evaluate_{args.mode}.json")
+                        f"evaluate_{args.split}_{args.mode}.json")
     with open(out_path, "w") as f:
         json.dump(results, f, indent=2)
     print(f"Results written to {out_path}")
