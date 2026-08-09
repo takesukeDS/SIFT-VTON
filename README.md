@@ -4,7 +4,9 @@
 
 This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
 
-> ⚠️ **Known issue:** the SIFT scale filter was inactive in the paper's experiments — see [#2](https://github.com/takesukeDS/SIFT-VTON/issues/2) for details, impact, and fix.
+## Updates
+- **2026-08-05** — Released weights updated (`sift_matching.zip` was updated on 2026-07-30). The checkpoint and correspondences on [🤗 takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON) are now produced with the corrected SIFT filtering — the method exactly as described in arXiv v1 §3.1 — and improve on the arXiv v1 numbers across all four metrics, see [Results](#results). These numbers will be reported in arXiv v2, together with a note on the fix described in the entry below. To reproduce the arXiv v1 model instead, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
+- **2026-07-20** — The SIFT scale filter (`filter_scale`) was inactive in the paper's experiments; fixed in `4438ff6`, and `--legacy_filtering` added to regenerate the paper's correspondences exactly. The fix changes ~2.5% of matches across ~8% of image pairs, leaving 92% of files unchanged. Details: [#2](https://github.com/takesukeDS/SIFT-VTON/issues/2).
 
 ## TODO
 - [x] Code for preprocessing
@@ -83,6 +85,31 @@ download Fine-grained Parsing in [GP-VTON](https://github.com/xiezhy6/GP-VTON) f
 We used garment parts segmentation provided by GP-VTON for better spatial matching.
 We refer the directory where you unzipped the cloth parsing as `[cloth_parsing_dir]` in the following instructions.
 
+## Inference
+```bash
+uv run python inference_hf.py \
+    --repo_id takesuke/SIFT-VTON \
+    --data_root_dir [VITON-HD dataset dir] \
+    --save_dir [output dir] \
+    --phase test \
+    --batch_size 4 \
+    --start_from_noised_agn \
+    --repaint
+```
+The checkpoint and config are downloaded from the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON) on the first run and cached under `~/.cache/huggingface/hub/`. Images are written to `[output dir]/pair`, or `[output dir]/unpair` with `--unpair`; both are the inputs expected by [Evaluation](#evaluation).
+
+| Argument | Default | Description |
+|---|---|---|
+| `--cfg_scale` | `1.5` | Classifier-free guidance scale; the value used for the reported results |
+| `--denoise_steps` | `50` | Number of denoising steps |
+| `--start_from_noised_agn` | off | Start denoising from the noised agnostic image instead of pure noise (recommended) |
+| `--repaint` | off | Paste back the unmasked region from the original image after generation (recommended) |
+| `--unpair` | off | Run unpaired inference (person and garment from different samples) |
+| `--phase` | `test` | `test` for the test split, `train` for the training split |
+| `--seed` | `1235` | Random seed |
+
+To run from local files instead of the Hub, pass `--config_path` and `--model_load_path` in place of `--repo_id`.
+
 ## Preprocessing: SIFT matching and filtering for training on VITON-HD dataset
 The code below saves the filtered SIFT correspondences in json for each image pair in the VITON-HD dataset. 
 ```
@@ -93,14 +120,42 @@ Move `[output dir]/train` into `[VITON-HD dataset dir]/train` as `sift_matching`
 mv [output dir]/train [VITON-HD dataset dir]/train/sift_matching
 ```
 
-> **Erratum:** in the code used for the paper's experiments, the scale-consistency filter (`filter_scale`) was inactive due to a bug (fixed in commit `4438ff6`); correspondences were filtered by the angle, HSV, and RANSAC constraints only. The released precomputed correspondences below match that legacy behavior. To regenerate the paper's correspondences exactly, pass `--legacy_filtering`; the default now applies the corrected filtering (measured difference: ~2.5% of matches, ~8% of image pairs affected, 92% of files unchanged).
-
-Alternatively, you can download the precomputed SIFT correspondences for the train split from the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON) and place it under the `train` directory of the VITON-HD dataset:
+Alternatively, you can download the precomputed SIFT correspondences for the train split from the [huggingface model repo](https://huggingface.co/takesuke/SIFT-VTON) and place it under the `train` directory of the VITON-HD dataset. This archive is the training data of the released weights, i.e. corrected filtering:
 ```bash
 hf download takesuke/SIFT-VTON sift_matching.zip --local-dir [VITON-HD dataset dir]/train
 cd [VITON-HD dataset dir]/train
 unzip sift_matching.zip
 ```
+
+### Reproducing the arXiv v1 result
+Earlier revisions of the huggingface model repo remain accessible, so the arXiv v1 checkpoint and correspondences can still be downloaded by pinning a commit.
+
+**arXiv v1 weights** (commit `c369585b3dd3`, 2026-06-07). Download the checkpoint alone and pair it with the current config — the `config.yaml` stored at that revision predates the `YahaVTON` → `SiftVTON` rename and will not load against this code:
+```bash
+hf download takesuke/SIFT-VTON model.ckpt --revision c369585b3dd3 --local-dir ./ckpts/arxiv_v1
+
+uv run python inference_hf.py \
+    --config_path configs/SIFT-VTON_sift_loss_ave.yaml \
+    --model_load_path ./ckpts/arxiv_v1/model.ckpt \
+    --data_root_dir [VITON-HD dataset dir] \
+    --save_dir [output dir] \
+    --phase test \
+    --batch_size 4 \
+    --start_from_noised_agn \
+    --repaint
+```
+
+**arXiv v1 correspondences** (commit `bd1bbcd5e5d9`, 2026-06-13):
+```bash
+hf download takesuke/SIFT-VTON sift_matching.zip --revision bd1bbcd5e5d9 --local-dir [VITON-HD dataset dir]/train
+cd [VITON-HD dataset dir]/train && unzip sift_matching.zip
+```
+Equivalently, `--legacy_filtering` regenerates them from the VITON-HD dataset:
+```bash
+python save_sift_matching.py --save_dir [output dir] --data_root_dir [VITON-HD dataset dir] --data_type train --cloth_segmentation_base_dir [cloth_parsing_dir] --legacy_filtering
+mv [output dir]/train [VITON-HD dataset dir]/train/sift_matching
+```
+Training on these with the command in [Training](#training) reproduces the arXiv v1 model rather than the released weights.
 
 ## Training
 
@@ -133,8 +188,20 @@ CUDA_VISIBLE_DEVICES=0,1 python train_siftvton.py \
 | `--snr_gamma` | `5.0` | Min-SNR loss weighting |
 | `--accum_iter` | `8` | Gradient accumulation steps. `--batch_size` is the global batch (split across GPUs), so effective batch = `batch_size × accum_iter` = 32 |
 
+## Results
+VITON-HD test set at 384×512. SSIM/LPIPS are computed on the paired setting, FID/KID on the unpaired setting.
+
+| Model | SSIM ↑ | LPIPS ↓ | FID ↓ | KID×1000 ↓ |
+|---|---|---|---|---|
+| SIFT-VTON (paper, arXiv v1) | 0.8877 | 0.0751 | 8.860 | 1.092 |
+| SIFT-VTON (released weights) | **0.8889** | **0.0738** | **8.593** | **0.754** |
+
+The released checkpoint implements the method exactly as described in arXiv v1 §3.1, including the scale-consistency filter. The arXiv v1 numbers were produced before the `filter_scale` bug was fixed ([#2](https://github.com/takesukeDS/SIFT-VTON/issues/2)), i.e. from correspondences filtered by the angle, HSV, and RANSAC constraints only; arXiv v2 will report the released checkpoint's numbers instead. To reproduce the arXiv v1 model, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
+
+> KID is computed by clean-fid over unseeded random subsets and varies by roughly 1% between runs. SSIM, LPIPS, and FID are exactly reproducible for a fixed set of predictions.
+
 ## Evaluation
-`evaluate.py` reproduces the quantitative results in Table 1. Predictions are the images produced by the inference scripts (the `pair` / `unpair` output directories).
+`evaluate.py` computes the metrics in the [Results](#results) table above, using the same protocol as the paper. Predictions are the images produced by the inference scripts (the `pair` / `unpair` output directories).
 
 SSIM and LPIPS (paired test set):
 ```bash
@@ -152,7 +219,7 @@ uv run python evaluate.py \
     --mode unpaired
 ```
 
-Implementation details (matching the paper's evaluation): SSIM/LPIPS are computed on full images resized to 384×512 (torchmetrics: AlexNet LPIPS, SSIM with `data_range=1.0`); FID/KID are computed with [clean-fid](https://github.com/GaParmar/clean-fid) against `test/image`. KID in Table 1 is multiplied by 1000.
+Implementation details (matching the paper's evaluation): SSIM/LPIPS are computed on full images resized to 384×512 (torchmetrics: AlexNet LPIPS, SSIM with `data_range=1.0`); FID/KID are computed with [clean-fid](https://github.com/GaParmar/clean-fid) against `test/image`. KID is multiplied by 1000, as in the paper.
 
 > **Note on reproducibility:** inference uses a fixed random seed (`--seed 1235` by default), and evaluating a fixed set of generated predictions with `evaluate.py` is exactly reproducible.
 
