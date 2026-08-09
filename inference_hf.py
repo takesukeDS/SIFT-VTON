@@ -72,7 +72,7 @@ def build_args():
     parser.add_argument("--phase", type=str, default="test")
     parser.add_argument("--start_from_noised_agn", action="store_true")
     parser.add_argument("--seed", type=int, default=1235)
-    parser.add_argument("--cfg_scale", type=float, default=1.0)
+    parser.add_argument("--cfg_scale", type=float, default=1.5)
 
     args = parser.parse_args()
 

@@ -99,7 +99,7 @@ The model and config are downloaded automatically from this Hub repository on th
 |---|---|---|
 | `--repo_id` | — | This Hub repo (`takesuke/SIFT-VTON`) |
 | `--phase` | `test` | `test` for the test split, `train` for the training split |
-| `--cfg_scale` | `1.0` | Classifier-free guidance scale |
+| `--cfg_scale` | `1.5` | Classifier-free guidance scale; the value used for the reported results |
 | `--denoise_steps` | `50` | Number of PLMS denoising steps |
 | `--start_from_noised_agn` | off | Start denoising from noised agnostic image instead of pure noise (recommended) |
 | `--repaint` | off | Paste back the unmasked region from the original image after generation (recommended) |
