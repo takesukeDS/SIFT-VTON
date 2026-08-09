@@ -1,5 +1,8 @@
 # [ICPR2026] SIFT-VTON: Geometric Correspondence Supervision on Cross-Attention for Virtual Try-On
 
+[![arXiv](https://img.shields.io/badge/arXiv-2605.01296-b31b1b.svg)](https://arxiv.org/abs/2605.01296)
+[![huggingface](https://img.shields.io/badge/🤗%20Hugging%20Face-Model-yellow.svg)](https://huggingface.co/takesuke/SIFT-VTON)
+
 ![teaser](assets/teaser.jpg)&nbsp;
 
 This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
