@@ -5,7 +5,7 @@
 This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
 
 ## Updates
-- **2026-08-05** — Released weights updated (`sift_matching.zip` was updated on 2026-07-30). The checkpoint and correspondences on [🤗 takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON) are now produced with the corrected SIFT filtering — the method exactly as described in arXiv v1 §3.1 — and improve on the arXiv v1 numbers across all four metrics, see [Results](#results). These numbers will be reported in arXiv v2, together with a note on the fix described in the entry below. To reproduce the arXiv v1 model instead, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
+- **2026-08-05** — Released weights updated (`sift_matching.zip` was updated on 2026-07-30). The checkpoint and correspondences on [🤗 takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON) are now produced with the corrected SIFT filtering — the method exactly as described in arXiv v1 §3.1 — and improve on the arXiv v1 numbers across all four metrics, see [Results](#results). These numbers will be reported in arXiv v2. To reproduce the arXiv v1 model instead, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
 - **2026-07-20** — The SIFT scale filter (`filter_scale`) was inactive in the paper's experiments; fixed in `4438ff6`, and `--legacy_filtering` added to regenerate the paper's correspondences exactly. The fix changes ~2.5% of matches across ~8% of image pairs, leaving 92% of files unchanged. Details: [#2](https://github.com/takesukeDS/SIFT-VTON/issues/2).
 
 ## TODO
