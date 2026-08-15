@@ -8,7 +8,8 @@
 This repository is derived from [StableVITON](https://github.com/rlawjdghek/stableviton).
 
 ## Updates
-- **2026-08-05** — Released weights updated (`sift_matching.zip` was updated on 2026-07-30). The checkpoint and correspondences on [🤗 takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON) are now produced with the corrected SIFT filtering — the method exactly as described in arXiv v1 §3.1 — and improve on the arXiv v1 numbers across all four metrics, see [Results](#results). These numbers will be reported in arXiv v2. To reproduce the arXiv v1 model instead, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
+- **2026-08-13** — [arXiv v2](https://arxiv.org/abs/2605.01296) is online. It reports the released checkpoint's numbers (see [Results](#results)); §3.1 is unchanged, since the released weights implement the method exactly as it was already described there.
+- **2026-08-05** — Released weights updated (`sift_matching.zip` was updated on 2026-07-30). The checkpoint and correspondences on [🤗 takesuke/SIFT-VTON](https://huggingface.co/takesuke/SIFT-VTON) are now produced with the corrected SIFT filtering — the method exactly as described in arXiv v1 §3.1 — and improve on the arXiv v1 numbers across all four metrics, see [Results](#results). These are the numbers reported in arXiv v2. To reproduce the arXiv v1 model instead, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
 - **2026-07-20** — The SIFT scale filter (`filter_scale`) was inactive in the paper's experiments; fixed in `4438ff6`, and `--legacy_filtering` added to regenerate the paper's correspondences exactly. The fix changes ~2.5% of matches across ~8% of image pairs, leaving 92% of files unchanged. Details: [#2](https://github.com/takesukeDS/SIFT-VTON/issues/2).
 
 ## TODO
@@ -196,10 +197,10 @@ VITON-HD test set at 384×512. SSIM/LPIPS are computed on the paired setting, FI
 
 | Model | SSIM ↑ | LPIPS ↓ | FID ↓ | KID×1000 ↓ |
 |---|---|---|---|---|
-| SIFT-VTON (paper, arXiv v1) | 0.8877 | 0.0751 | 8.860 | 1.092 |
-| SIFT-VTON (released weights) | **0.8889** | **0.0738** | **8.593** | **0.754** |
+| SIFT-VTON (arXiv v1) | 0.8877 | 0.0751 | 8.860 | 1.092 |
+| SIFT-VTON (released weights, arXiv v2) | **0.8889** | **0.0738** | **8.593** | **0.754** |
 
-The released checkpoint implements the method exactly as described in arXiv v1 §3.1, including the scale-consistency filter. The arXiv v1 numbers were produced before the `filter_scale` bug was fixed ([#2](https://github.com/takesukeDS/SIFT-VTON/issues/2)), i.e. from correspondences filtered by the angle, HSV, and RANSAC constraints only; arXiv v2 will report the released checkpoint's numbers instead. To reproduce the arXiv v1 model, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
+The released checkpoint implements the method exactly as described in arXiv v1 §3.1, including the scale-consistency filter. The arXiv v1 numbers were produced before the `filter_scale` bug was fixed ([#2](https://github.com/takesukeDS/SIFT-VTON/issues/2)), i.e. from correspondences filtered by the angle, HSV, and RANSAC constraints only; arXiv v2 reports the released checkpoint's numbers instead. To reproduce the arXiv v1 model, see [Reproducing the arXiv v1 result](#reproducing-the-arxiv-v1-result).
 
 > KID is computed by clean-fid over unseeded random subsets and varies by roughly 1% between runs. SSIM, LPIPS, and FID are exactly reproducible for a fixed set of predictions.
 
